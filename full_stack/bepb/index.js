@@ -1,7 +1,10 @@
+require('dotenv').config({ path: 'pb.env' });
 const express = require('express');
 const app = express();
 const morgan = require('morgan');
 const cors = require('cors');
+const Person = require('./models/person');
+
 app.use(cors());
 app.use(express.static('build'));
 app.use(express.json());
@@ -16,23 +19,23 @@ app.use(morgan(':method :url :status :res[content-length] - :response-time ms :b
   skip: (req, res) => { return req.method !== 'POST' }
 }));
 
-let persons = [
-  {
-    id: 1,
-    name: 'Steve Price',
-    number: '780-233-8792',
-  },
-  {
-    id: 2,
-    name: 'Joy Ramoso-Price',
-    number: '780-266-7887',
-  },
-  {
-    id: 3,
-    name: 'Jay Ramoso',
-    number: '780-123-4567',
-  }
-];
+// let persons = [
+//   {
+//     id: 1,
+//     name: 'Steve Price',
+//     number: '780-233-8792',
+//   },
+//   {
+//     id: 2,
+//     name: 'Joy Ramoso-Price',
+//     number: '780-266-7887',
+//   },
+//   {
+//     id: 3,
+//     name: 'Jay Ramoso',
+//     number: '780-123-4567',
+//   }
+// ];
 
 app.get('/', (req, res) => {
   res.send('<h1>Hello World!</h1>');
@@ -46,7 +49,9 @@ app.get('/info', (req, res) => {
 });
 
 app.get('/api/persons', (req, res) => {
-  res.json(persons);
+  Person.find({}).then(persons => {
+    res.json(persons);
+  });
 });
 
 const generateId = () => {
@@ -74,7 +79,6 @@ app.post('/api/persons', (req, res) => {
     name: body.name,
     number: body.number,
   }
-  console.log(person);
 
   persons = persons.concat(person);
 
@@ -99,7 +103,7 @@ app.delete('/api/persons/:id', (req, res) => {
    res.status(204).end();
 })
 
-const PORT = process.env.PORT || 5050;
+const PORT = process.env.PORT;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

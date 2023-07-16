@@ -8,21 +8,21 @@ mongoose.connect(url)
   .then(result => {
     console.log('connected to MongoDB');
   })
-  .catch(error => {
+  .catch((error) => {
     console.log('error connecting to MongoDB:', error.message);
   });
 
-const noteSchema = new mongoose.Schema({
-  content: String,
-  important: Boolean,
+const phonebookSchema = new mongoose.Schema({
+  name: String,
+  number: String,
 });
 
-noteSchema.set('toJSON', {
+phonebookSchema.set('toJSON', {
   transform: (document, returnedObject) => {
     returnedObject.id = String(returnedObject._id);
     delete returnedObject._id;
     delete returnedObject.__v;
   }
-});
+})
 
-module.exports = mongoose.model('Note', noteSchema);
+module.exports = mongoose.model('Person', phonebookSchema);
