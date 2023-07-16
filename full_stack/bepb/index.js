@@ -54,46 +54,31 @@ app.get('/api/persons', (req, res) => {
   });
 });
 
-const generateId = () => {
-  const maxId = persons.length > 0
-    ? Math.max(...persons.map(c => c.id))
-    : 0;
-  return maxId + 1;
-}
-
 app.post('/api/persons', (req, res) => {
   const body = req.body;
 
-  if (!body.name || !body.number) {
-    return res.status(400).json({
-      error: 'content missing'
-    });
+  if (body.name === undefined || body.number === undefined) {
+    return res.status(400).json({ error: 'content missing' });
   } else if (persons.some(c => c.name === body.name)) {
     return res.status(400).json({
       error: 'name must be unique'
     });
   }
 
-  const person = {
-    id: generateId(),
+  const person = new Person({
     name: body.name,
     number: body.number,
-  }
+  });
 
-  persons = persons.concat(person);
-
-  res.json(person);
+  person.save().then(savedPerson => {
+    response.json(savedPerson);
+  });
 });
 
 app.get('/api/persons/:id', (req, res) => {
-  const id = Number(req.params.id);
-  const contact = persons.find((c) => c.id === id);
-
-  if (contact) {
-    res.json(contact);
-  } else {
-    res.status(404).end();
-  }
+  Person.findById(req.params.id).then(person => {
+    response.json(person);
+  });
 });
 
 app.delete('/api/persons/:id', (req, res) => {
