@@ -59,11 +59,12 @@ app.post('/api/persons', (req, res) => {
 
   if (body.name === undefined || body.number === undefined) {
     return res.status(400).json({ error: 'content missing' });
-  } else if (persons.some(c => c.name === body.name)) {
-    return res.status(400).json({
-      error: 'name must be unique'
-    });
-  }
+  } 
+  // if (persons.some(c => c.name === body.name)) {
+  //   return res.status(400).json({
+  //     error: 'name must be unique'
+  //   });
+  // }
 
   const person = new Person({
     name: body.name,
@@ -71,13 +72,13 @@ app.post('/api/persons', (req, res) => {
   });
 
   person.save().then(savedPerson => {
-    response.json(savedPerson);
+    res.json(savedPerson);
   });
 });
 
 app.get('/api/persons/:id', (req, res) => {
   Person.findById(req.params.id).then(person => {
-    response.json(person);
+    res.json(person);
   });
 });
 
