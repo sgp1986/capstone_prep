@@ -8,7 +8,7 @@ if (process.argv.length < 3) {
 const password = process.argv[2];
 
 const url = 
-  `mongodb+srv://sgp1986:${password}@cluster0.zgyneh9.mongodb.net/noteApp?retryWrites=true&w=majority`;
+  `mongodb+srv://sgp1986:${password}@cluster0.zgyneh9.mongodb.net/testNoteApp?retryWrites=true&w=majority`;
 
 mongoose.set('strictQuery', false);
 mongoose.connect(url);
@@ -25,11 +25,11 @@ const Note = mongoose.model('Note', noteSchema);
 //   important: true,
 // });
 
-// const note = new Note({
-//   "id": 2,
-//   "content": "Browser can execute only JavaScript",
-//   "important": true
-// });
+const note = new Note({
+  "id": 2,
+  "content": "Browser can execute only JavaScript",
+  "important": true
+});
 
 // const note = new Note({
 //   "id": 3,
@@ -37,14 +37,14 @@ const Note = mongoose.model('Note', noteSchema);
 //   "important": false
 // });
 
-// note.save().then(result => {
-//   console.log('note saved!');
-//   mongoose.connection.close();
-// });
-
-Note.find({}).then(result => {
-  result.forEach(note => {
-    console.log(note);
-  });
+note.save().then(result => {
+  console.log('note saved!');
   mongoose.connection.close();
 });
+
+// Note.find({}).then(result => {
+//   result.forEach(note => {
+//     console.log(note);
+//   });
+//   mongoose.connection.close();
+// });
