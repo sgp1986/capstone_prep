@@ -10,27 +10,23 @@ import loginService from './services/login';
 
 const App = () => {
   const [notes, setNotes] = useState([]);
+  // eslint-disable-next-line no-unused-vars
   const [newNote, setNewNote] = useState('');
   const [showAll, setShowAll] = useState(true);
   const [errorMessage, setErrorMessage] = useState(null);
-  
+
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [user, setUser] = useState(null);
-  const [loginVisible, setLoginVisible] = useState(false);
+  // const [loginVisible, setLoginVisible] = useState(false);
 
   const noteFormRef = useRef();
-  const noteForm = () => (
-    <Togglable buttonLabel='new note' ref={noteFormRef}>
-      <NoteForm createNote={addNote} />
-    </Togglable>
-  )
 
   useEffect(() => {
     noteService
       .getAll()
       .then(initialNotes => {
-        setNotes(initialNotes)
+        setNotes(initialNotes);
       });
   }, []);
 
@@ -62,12 +58,12 @@ const App = () => {
       .then(returnedNote => {
         setNotes(notes.map(note => note.id !== id ? note : returnedNote));
       })
-      .catch(error => {
+      .catch(() => {
         setErrorMessage(
           `Note '${note.content}' was already removed from server.`
         );
         setTimeout(() => {
-          setErrorMessage(null)
+          setErrorMessage(null);
         }, 5000);
         setNotes(notes.filter(n => n.id !== id));
       });
@@ -75,7 +71,7 @@ const App = () => {
 
   const handleLogin = async event => {
     event.preventDefault();
-    
+
     try {
       const user = await loginService.login({
         username, password,
@@ -92,14 +88,14 @@ const App = () => {
     } catch(exception) {
       setErrorMessage('Wrong credentials');
       setTimeout(() => {
-        setErrorMessage(null)
+        setErrorMessage(null);
       }, 5000);
     }
   };
 
   const notesToShow = showAll
     ? notes
-    : notes.filter(note => note.important)
+    : notes.filter(note => note.important);
 
   return (
     <div>
@@ -122,7 +118,9 @@ const App = () => {
       {user &&
         <div>
           <p>{user.name} logged in</p>
-          {noteForm()}
+          <Togglable buttonLabel='new note' ref={noteFormRef}>
+            <NoteForm createNote={addNote} />
+          </Togglable>
         </div>
       }
 
@@ -134,10 +132,10 @@ const App = () => {
 
       <ul>
         <ul>
-          {notesToShow.map(note => 
-            <Note 
-              key={note.id} 
-              note={note} 
+          {notesToShow.map(note =>
+            <Note
+              key={note.id}
+              note={note}
               toggleImportance={() => toggleImportanceOf(note.id)}
             />
           )}
@@ -146,7 +144,7 @@ const App = () => {
 
       <Footer />
     </div>
-  )
-}
+  );
+};
 
-export default App
+export default App;
