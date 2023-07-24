@@ -1,30 +1,42 @@
 import { useState } from 'react'
+import { useField } from './hooks'
 import {
   BrowserRouter as Router,
   Routes, Route, Link, useParams, useNavigate
 } from 'react-router-dom';
+import {
+  Container, Paper, TextField, Button, Alert, AppBar, Toolbar, IconButton,
+  Table, TableContainer, TableRow, TableBody, TableCell
+} from '@mui/material';
 
 const Menu = () => {
-  const padding = {
-    paddingRight: 5
-  }
   return (
-    <div>
-      <Link style={padding} to='/'>anecdotes</Link>
-      <Link style={padding} to='/create'>create new</Link>
-      <Link style={padding} to='/about'>about</Link>
-    </div>
+    <AppBar position='static'>
+      <Toolbar>
+        <IconButton edge='start' color='inherit' aria-label='menu'>
+        </IconButton>
+        <Button color='inherit' component={Link} to='/'>
+          anecdotes
+        </Button>
+        <Button color='inherit'component={Link} to='/create'>
+          create new
+        </Button>
+        <Button color='inherit' component={Link} to='/about'>
+          about
+        </Button>
+      </Toolbar>
+    </AppBar>
   )
 }
 
-const Anecdote = ({ anecdotes, findAnecdote }) => {
+const Anecdote = ({  findAnecdote }) => {
   const id = Number(useParams().id);
   const anecdote = findAnecdote(id);
   return (
     <div>
-      <h2>{anecdote.content} by {anecdote.author}</h2>
+      <h2>{anecdote.content.value} by {anecdote.author.value}</h2>
       <p>has {anecdote.votes} votes</p>
-      <p>for more info see <a href={anecdote.info}>{anecdote.info}</a></p>
+      <p>for more info see <a href={anecdote.info.value}>{anecdote.info.value}</a></p>
     </div>
   )
 }
@@ -32,15 +44,24 @@ const Anecdote = ({ anecdotes, findAnecdote }) => {
 const AnecdoteList = ({ anecdotes }) => (
   <div>
     <h2>Anecdotes</h2>
-    <ul>
-      {anecdotes.map(anecdote => 
-        <li key={anecdote.id} >
-          <Link to={`/anecdotes/${anecdote.id}`}>
-            {anecdote.content}
-          </Link>
-        </li>
-      )}
-    </ul>
+    <TableContainer component={Paper}>
+      <Table>
+        <TableBody>
+          {anecdotes.map(anecdote => 
+            <TableRow key={anecdote.id} >
+              <TableCell>
+                <Link to={`/anecdotes/${anecdote.id}`}>
+                  {anecdote.content.value}
+                </Link>
+              </TableCell>
+              <TableCell>
+                {anecdote.author.value}
+              </TableCell>
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
+    </TableContainer>
   </div>
 )
 
@@ -66,52 +87,74 @@ const Footer = () => (
   </div>
 )
 
-const Notification = ({ message }) => {
-  if (message === null) {
-    return null;
-  }
-
-  return (
-    <div className='error'>{message}</div>
-  );
-};
-
-const CreateNew = (props) => {
+const CreateNew = ({ addNew, setNotification }) => {
   const navigate = useNavigate()
-  const [content, setContent] = useState('')
-  const [author, setAuthor] = useState('')
-  const [info, setInfo] = useState('')
+  const content = useField('text')
+  const author = useField('text')
+  const info = useField('text')
 
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    props.addNew({
+    addNew({
       content,
       author,
       info,
       votes: 0
     })
+    setNotification(`a new anecdote ${content.value} created!`)
+    setTimeout(() => {
+      setNotification(null)
+    }, 5000);
     navigate('/')
   }
 
   return (
     <div>
       <h2>create a new anecdote</h2>
-      <form onSubmit={handleSubmit}>
+      <form>
         <div>
-          content
-          <input name='content' value={content} onChange={(e) => setContent(e.target.value)} />
+          <TextField label='content' />
         </div>
         <div>
-          author
-          <input name='author' value={author} onChange={(e) => setAuthor(e.target.value)} />
+          <TextField label='author' />
         </div>
         <div>
-          url for more info
-          <input name='info' value={info} onChange={(e)=> setInfo(e.target.value)} />
+          <TextField label='info' />
         </div>
-        <button>create</button>
+        <div>
+          <Button 
+            variant='contained' 
+            color='primary' 
+            onClick={handleSubmit}
+          >
+            create
+          </Button>
+          <Button 
+            variant='contained' 
+            color='secondary' 
+            onClick={() => navigate('/create')}
+          >
+            reset
+          </Button>
+        </div>
       </form>
+      {/* <Form>
+        <Form.Group>
+          <Form.Label>content</Form.Label>
+          <Form.Control {...content} />
+        </Form.Group>
+        <Form.Group>
+          <Form.Label>author</Form.Label>
+          <Form.Control {...author} />
+        </Form.Group>
+        <Form.Group>
+          <Form.Label>info</Form.Label>
+          <Form.Control {...info} />
+        </Form.Group>
+        <Button variant='primary' onClick={handleSubmit}>create</Button>
+        <Button>reset</Button>
+      </Form> */}
     </div>
   )
 }
@@ -119,16 +162,16 @@ const CreateNew = (props) => {
 const App = () => {
   const [anecdotes, setAnecdotes] = useState([
     {
-      content: 'If it hurts, do it more often',
-      author: 'Jez Humble',
-      info: 'https://martinfowler.com/bliki/FrequencyReducesDifficulty.html',
+      content: { value: 'If it hurts, do it more often' },
+      author: { value: 'Jez Humble' },
+      info: { value: 'https://martinfowler.com/bliki/FrequencyReducesDifficulty.html' },
       votes: 0,
       id: 1
     },
     {
-      content: 'Premature optimization is the root of all evil',
-      author: 'Donald Knuth',
-      info: 'http://wiki.c2.com/?PrematureOptimization',
+      content: { value:'Premature optimization is the root of all evil' },
+      author: { value: 'Donald Knuth' },
+      info: { value: 'http://wiki.c2.com/?PrematureOptimization' },
       votes: 0,
       id: 2
     }
@@ -156,24 +199,30 @@ const App = () => {
   }
 
   return (
-    <Router>
-      <div>
-        <h1>Software anecdotes</h1>
-        <Menu />
-        <Notification message={notification} />
-      </div>
+    <Container>
+      <Router>
+        <div>
+          <h1>Software anecdotes</h1>
+          <Menu />
+          {(notification &&
+            <Alert severity='success'>
+              {notification}
+            </Alert>
+          )}
+        </div>
 
-      <Routes>
-        <Route path='/anecdotes/:id' element={<Anecdote anecdotes={anecdotes} findAnecdote={anecdoteById} />} />
-        <Route path='/' element={<AnecdoteList anecdotes={anecdotes} />}/>
-        <Route path='/create' element={<CreateNew addNew={addNew} />}/>
-        <Route path='/about' element={<About />}/>
-      </Routes>
+        <Routes>
+          <Route path='/anecdotes/:id' element={<Anecdote findAnecdote={anecdoteById} />} />
+          <Route path='/' element={<AnecdoteList anecdotes={anecdotes} />}/>
+          <Route path='/create' element={<CreateNew addNew={addNew} setNotification={setNotification} />}/>
+          <Route path='/about' element={<About />}/>
+        </Routes>
 
-      <div>
-        <Footer />
-      </div>
-    </Router>
+        <div>
+          <Footer />
+        </div>
+      </Router>
+    </Container>
   )
 }
 
