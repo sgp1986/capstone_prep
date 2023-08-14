@@ -43,6 +43,7 @@ package main
 import "fmt"
 
 func MaximumSubarraySum(numbers []int) (highestSum int) {
+
 	allPositive := true
 
 	for i := 0; i < len(numbers); i++ {
@@ -56,7 +57,7 @@ func MaximumSubarraySum(numbers []int) (highestSum int) {
 			if j - 1 == i {
 				subNumbers = numbers[:j]
 			} else {
-				subNumbers = numbers[i:j]
+				subNumbers = numbers[i:j+1]
 			}
 
 			for _, v := range subNumbers {
