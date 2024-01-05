@@ -1,1 +1,1 @@
-# capstone_prep
+Learning Docker, Go, Typescript, etc.
